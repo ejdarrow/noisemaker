@@ -18,8 +18,12 @@ def play():
     os.system(f"afplay {path_to_file.name}")
 
 def play_corrupt():
-    os.system(f"afplay {corrupted_child.name}")
+    #not mac
+    #playsound(corrupted_child.name)
 
+    # mac
+    os.system(f"afplay {corrupted_child.name}")
+WIDTH = 3
 def corrupt(f: Path, num:int):
     b64 = base64.b64encode(f.read_bytes())
     bytes_len = len(b64)
@@ -27,10 +31,10 @@ def corrupt(f: Path, num:int):
     for x in range(num):
         addr = random.randint(10000, bytes_len - 1)
         addr2 = random.randint(addr, bytes_len - 1)
-        new = b64[addr2:addr2+2]
-        old = b64[addr:addr+2]
+        new = b64[addr2:addr2+WIDTH]
+        old = b64[addr:addr+WIDTH]
         print(f"{old} <-> {new}")
-        b64 = b64[0:addr-1] + b64[addr2:addr2+2] + b64[addr+2:addr2-1] + b64[addr:addr+2] + b64[addr2+2:bytes_len-1]
+        b64 = b64[0:addr-1] + b64[addr2:addr2+WIDTH] + b64[addr+WIDTH:addr2-1] + b64[addr:addr+WIDTH] + b64[addr2+WIDTH:bytes_len-1]
 
     missing_padding = len(b64) % 4
     if missing_padding:
@@ -42,10 +46,10 @@ path_to_file = Path("./asdf.mp3")
 
 corrupted_child = Path("./asdf-corrupt.mp3")
 corrupted_child.write_bytes(path_to_file.read_bytes())
-generations = 5
+generations = 10
 play()
 for generation in range(generations):
-    corrupted_child.write_bytes(corrupt(corrupted_child, pow(2, generation)))
+    corrupted_child.write_bytes(corrupt(corrupted_child, 2*(1+generation)))
     play_corrupt()
 
 
